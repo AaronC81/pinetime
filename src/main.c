@@ -73,9 +73,9 @@ void main(void) {
 		k_sleep(MSEC_PER_SEC);
 
 		/* Heartrate measurements simulation */
-		hl_bluetooth_hrs_notify();
+		hl_bluetooth_hrs_notify(69);
 
 		/* Battery level simulation */
-		hl_bluetooth_bas_notify();
+		hl_bluetooth_bas_notify(69);
 	}
 }
