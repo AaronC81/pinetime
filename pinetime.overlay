@@ -1,0 +1,12 @@
+/ {
+	buttons {
+		button_enable: button_enable {
+			gpios = <&gpio0 15 GPIO_INT_ACTIVE_HIGH>;
+			label = "Button enable";
+		};
+	};
+
+	aliases {
+		button-enable = &button_enable;
+	};
+};

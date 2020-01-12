@@ -7,12 +7,34 @@
 #define BL_PORT DT_ALIAS_LED1_GPIOS_CONTROLLER
 #define BL_PIN DT_ALIAS_LED1_GPIOS_PIN
 
+#define BTN_PORT DT_ALIAS_SW0_GPIOS_CONTROLLER
+#define BTN_PIN DT_ALIAS_SW0_GPIOS_PIN
+
+#define BTN_ENABLE_PORT DT_ALIAS_BUTTON_ENABLE_GPIOS_CONTROLLER
+#define BTN_ENABLE_PIN DT_ALIAS_BUTTON_ENABLE_GPIOS_PIN
+
+
 // Enables the backlight.
-void backlight_init(void)
-{
+void backlight_init(void) {
 	struct device *dev = device_get_binding(BL_PORT);
 	gpio_pin_configure(dev, BL_PIN, GPIO_DIR_OUT);
 	gpio_pin_write(dev, BL_PIN, 0);
+}
+
+void button_init(void) {
+	struct device *dev = device_get_binding(BTN_PORT);
+	gpio_pin_configure(dev, BTN_PIN, GPIO_DIR_IN | GPIO_PUD_PULL_DOWN);
+
+	dev = device_get_binding(BTN_ENABLE_PORT);
+	gpio_pin_configure(dev, BTN_ENABLE_PIN, GPIO_DIR_OUT);
+	gpio_pin_write(dev, BTN_ENABLE_PIN, 1);
+}
+
+int button_read(void) {
+	struct device *dev = device_get_binding(BTN_PORT);
+	int value;
+	gpio_pin_read(dev, BTN_PIN, &value);
+	return value;
 }
 
 #define qrprintf(ctx, ...) do { \
@@ -22,11 +44,11 @@ void backlight_init(void)
 		graphics_draw_qr_code(ctx, 0, 0, sprintfed); \
 	} while (0)
 
-void main(void)
-{	
+void main(void) {
 	struct device *display = device_get_binding(DT_INST_0_SITRONIX_ST7789V_LABEL);
 
 	backlight_init();
+	button_init();
 
 	struct graphics_context ctx = graphics_init(display);
 	graphics_clear_display(&ctx);
@@ -34,9 +56,16 @@ void main(void)
 	struct device *i2c_dev = device_get_binding("I2C_1");
 	uint8_t cfg_res = i2c_configure(i2c_dev, I2C_SPEED_SET(I2C_SPEED_STANDARD) | I2C_MODE_MASTER);
 
-	qrprintf(&ctx, "dev: %x, cfg: %x", (unsigned int*)i2c_dev, (unsigned int*)cfg_res);
+	qrprintf(&ctx, "port %x pin %x", BTN_PORT, BTN_PIN);
 
-	while (1) {	
-		k_sleep(100);
+	int x = 0;
+
+	while (1) {			
+		uint16_t color = button_read() ? DISPLAY_BLACK : DISPLAY_WHITE;
+		graphics_draw_rect(&ctx, x, 150, 2, 20, color);
+
+		x += 2;
+
+		k_sleep(1000);
 	}
 }
