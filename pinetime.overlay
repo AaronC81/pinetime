@@ -1,6 +1,6 @@
 / {
 	buttons {
-		button_enable {
+		button_enable: button_enable {
 			gpios = <&gpio0 15 GPIO_INT_ACTIVE_HIGH>;
 			label = "Button enable";
 		};
@@ -8,5 +8,12 @@
 
 	aliases {
 		button-enable = &button_enable;
+	};
+};
+
+&i2c1 {
+	cst816s@15 {
+		reg = <0x15>;
+		label = "CST816S";
 	};
 };
