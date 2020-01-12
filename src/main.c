@@ -3,6 +3,7 @@
 
 #include "qrcodegen.h"
 #include "graphics.h"
+#include "hl_bluetooth.h"
 
 #define BL_PORT DT_ALIAS_LED1_GPIOS_CONTROLLER
 #define BL_PIN DT_ALIAS_LED1_GPIOS_PIN
@@ -44,6 +45,8 @@ int button_read(void) {
 		graphics_draw_qr_code(ctx, 0, 0, sprintfed); \
 	} while (0)
 
+static struct graphics_context *global_ctx;
+
 void main(void) {
 	struct device *display = device_get_binding(DT_INST_0_SITRONIX_ST7789V_LABEL);
 
@@ -51,21 +54,28 @@ void main(void) {
 	button_init();
 
 	struct graphics_context ctx = graphics_init(display);
+	global_ctx = &ctx;
 	graphics_clear_display(&ctx);
 
 	struct device *i2c_dev = device_get_binding("I2C_1");
 	uint8_t cfg_res = i2c_configure(i2c_dev, I2C_SPEED_SET(I2C_SPEED_STANDARD) | I2C_MODE_MASTER);
 
-	qrprintf(&ctx, "port %x pin %x", BTN_PORT, BTN_PIN);
+	qrprintf(&ctx, "Starting...");
 
-	int x = 0;
+	hl_bluetooth_init();
 
-	while (1) {			
-		uint16_t color = button_read() ? DISPLAY_BLACK : DISPLAY_WHITE;
-		graphics_draw_rect(&ctx, x, 150, 2, 20, color);
+	qrprintf(&ctx, "Bluetooth ready!");
+	
+	/* Implement notification. At the moment there is no suitable way
+	 * of starting delayed work so we do it here
+	 */
+	while (1) {
+		k_sleep(MSEC_PER_SEC);
 
-		x += 2;
+		/* Heartrate measurements simulation */
+		hl_bluetooth_hrs_notify();
 
-		k_sleep(1000);
+		/* Battery level simulation */
+		hl_bluetooth_bas_notify();
 	}
 }
