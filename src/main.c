@@ -14,6 +14,8 @@
 #define BTN_ENABLE_PORT DT_ALIAS_BUTTON_ENABLE_GPIOS_CONTROLLER
 #define BTN_ENABLE_PIN DT_ALIAS_BUTTON_ENABLE_GPIOS_PIN
 
+#define TOUCH_INT_PORT DT_ALIAS_TOUCH_INTERRUPT_GPIOS_CONTROLLER
+#define TOUCH_INT_PIN DT_ALIAS_TOUCH_INTERRUPT_GPIOS_PIN
 
 // Enables the backlight.
 void backlight_init(void) {
@@ -47,6 +49,10 @@ int button_read(void) {
 
 static struct graphics_context *global_ctx;
 
+void touch_pressed(struct device *gpiob, struct gpio_callback *cb, u32_t pins) {
+	qrprintf(global_ctx, "I have been pressed");
+}
+
 void main(void) {
 	struct device *display = device_get_binding(DT_INST_0_SITRONIX_ST7789V_LABEL);
 
@@ -65,6 +71,15 @@ void main(void) {
 	hl_bluetooth_init();
 
 	qrprintf(&ctx, "Bluetooth ready!");
+
+	struct device *dev = device_get_binding(TOUCH_INT_PORT);
+	gpio_pin_configure(dev, TOUCH_INT_PIN, GPIO_DIR_IN | GPIO_INT);
+	
+	struct gpio_callback gpio_cb;
+
+	gpio_init_callback(&gpio_cb, touch_pressed, BIT(TOUCH_INT_PIN));
+	gpio_add_callback(dev, &gpio_cb);
+	gpio_pin_enable_callback(dev, TOUCH_INT_PIN);
 	
 	/* Implement notification. At the moment there is no suitable way
 	 * of starting delayed work so we do it here

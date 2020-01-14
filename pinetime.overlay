@@ -6,7 +6,16 @@
 		};
 	};
 
+	touch {
+		compatible = "gpio-keys";
+		touch_interrupt: touch_interrupt {
+			gpios = <&gpio0 28 GPIO_INT_ACTIVE_HIGH>;
+			label = "Touch controller interrupt";
+		};
+	};
+
 	aliases {
+		touch-interrupt = &touch_interrupt;
 		button-enable = &button_enable;
 	};
 };
