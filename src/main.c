@@ -70,12 +70,18 @@ void main(void) {
 	 * of starting delayed work so we do it here
 	 */
 	while (1) {
-		k_sleep(MSEC_PER_SEC);
+		k_sleep(MSEC_PER_SEC * 5);
 
 		/* Heartrate measurements simulation */
 		hl_bluetooth_hrs_notify(69);
 
 		/* Battery level simulation */
 		hl_bluetooth_bas_notify(69);
+
+		uint8_t* ct = fetch_ct();
+		qrprintf(&ctx, "%d %d %d %d %d %d %d %d %d %d",
+			ct[0], ct[1], ct[2], ct[3], ct[4], ct[5], ct[6], ct[7], ct[8], ct[9]);
+
+		cts_notify();
 	}
 }
