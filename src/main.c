@@ -4,6 +4,7 @@
 #include "qrcodegen.h"
 #include "graphics.h"
 #include "hl_bluetooth.h"
+#include "touch.h"
 
 #define BL_PORT DT_ALIAS_LED1_GPIOS_CONTROLLER
 #define BL_PIN DT_ALIAS_LED1_GPIOS_PIN
@@ -13,9 +14,6 @@
 
 #define BTN_ENABLE_PORT DT_ALIAS_BUTTON_ENABLE_GPIOS_CONTROLLER
 #define BTN_ENABLE_PIN DT_ALIAS_BUTTON_ENABLE_GPIOS_PIN
-
-#define TOUCH_INT_PORT DT_ALIAS_TOUCH_INTERRUPT_GPIOS_CONTROLLER
-#define TOUCH_INT_PIN DT_ALIAS_TOUCH_INTERRUPT_GPIOS_PIN
 
 // Enables the backlight.
 void backlight_init(void) {
@@ -50,7 +48,15 @@ int button_read(void) {
 static struct graphics_context *global_ctx;
 
 void touch_pressed(struct device *gpiob, struct gpio_callback *cb, u32_t pins) {
-	qrprintf(global_ctx, "I have been pressed");
+	qrprintf(global_ctx, "Press!");
+
+	// Thought: may already be configured?
+	struct device *i2c_dev = device_get_binding("I2C_1");
+	int cfg_stat = i2c_configure(i2c_dev, I2C_SPEED_SET(I2C_SPEED_STANDARD) | I2C_MODE_MASTER);
+
+	uint8_t b;
+	int read_stat = i2c_reg_read_byte(i2c_dev, 0x15, 0x3, &b);
+	qrprintf(global_ctx, "Config: %d Status: %d Byte: %x", cfg_stat, read_stat, b);	
 }
 
 void main(void) {
@@ -58,28 +64,17 @@ void main(void) {
 
 	backlight_init();
 	button_init();
+	touch_init(touch_pressed);
 
 	struct graphics_context ctx = graphics_init(display);
 	global_ctx = &ctx;
 	graphics_clear_display(&ctx);
-
-	struct device *i2c_dev = device_get_binding("I2C_1");
-	uint8_t cfg_res = i2c_configure(i2c_dev, I2C_SPEED_SET(I2C_SPEED_STANDARD) | I2C_MODE_MASTER);
 
 	qrprintf(&ctx, "Starting...");
 
 	hl_bluetooth_init();
 
 	qrprintf(&ctx, "Bluetooth ready!");
-
-	struct device *dev = device_get_binding(TOUCH_INT_PORT);
-	gpio_pin_configure(dev, TOUCH_INT_PIN, GPIO_DIR_IN | GPIO_INT);
-	
-	struct gpio_callback gpio_cb;
-
-	gpio_init_callback(&gpio_cb, touch_pressed, BIT(TOUCH_INT_PIN));
-	gpio_add_callback(dev, &gpio_cb);
-	gpio_pin_enable_callback(dev, TOUCH_INT_PIN);
 	
 	/* Implement notification. At the moment there is no suitable way
 	 * of starting delayed work so we do it here
