@@ -4,7 +4,7 @@
 
 struct gpio_callback _touch_callback;
 struct device *_i2c_dev;
-bool _touch_available_flag;
+bool _touch_available_flag = false;
 
 // A callback invoked immediately when the device detects a touch.
 void _touch_pressed_cb(struct device *gpiob, struct gpio_callback *cb, u32_t pins) {
