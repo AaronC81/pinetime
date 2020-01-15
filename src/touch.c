@@ -51,6 +51,7 @@ bool _touch_read(uint16_t *x, uint16_t *y) {
 // event loop to handle input.
 bool touch_get(uint16_t *x, uint16_t *y) {
 	if (_touch_available_flag) {
+		_touch_available_flag = false;
 		_touch_read(x, y);
 		return true;
 	}
