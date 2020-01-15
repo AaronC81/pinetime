@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "qrcodegen.h"
 #include "graphics.h"
@@ -47,16 +48,22 @@ int button_read(void) {
 
 static struct graphics_context *global_ctx;
 
+struct device *i2c_dev;
+int read_flag;
+
 void touch_pressed(struct device *gpiob, struct gpio_callback *cb, u32_t pins) {
-	qrprintf(global_ctx, "Press!");
+	read_flag = true;
+}
 
-	// Thought: may already be configured?
-	struct device *i2c_dev = device_get_binding("I2C_1");
-	int cfg_stat = i2c_configure(i2c_dev, I2C_SPEED_SET(I2C_SPEED_STANDARD) | I2C_MODE_MASTER);
+bool touch_raw_read(uint16_t *x, uint16_t *y) {
+	uint8_t b[63] = { 0 };
+	i2c_write(i2c_dev, b, 1, 0x15);
+	int read_stat = i2c_read(i2c_dev, b, 63, 0x15);
 
-	uint8_t b;
-	int read_stat = i2c_reg_read_byte(i2c_dev, 0x15, 0x3, &b);
-	qrprintf(global_ctx, "Config: %d Status: %d Byte: %x", cfg_stat, read_stat, b);	
+	*x = ((b[3] & 0xF) << 8) | b[4];
+	*y = ((b[5] & 0xF) << 8) | b[6];
+
+	return (read_stat == 0);
 }
 
 void main(void) {
@@ -70,22 +77,20 @@ void main(void) {
 	global_ctx = &ctx;
 	graphics_clear_display(&ctx);
 
-	qrprintf(&ctx, "Starting...");
-
-	hl_bluetooth_init();
-
-	qrprintf(&ctx, "Bluetooth ready!");
+	graphics_draw_rect(&ctx, 30, 30, 10, 10, DISPLAY_WHITE);
 	
-	/* Implement notification. At the moment there is no suitable way
-	 * of starting delayed work so we do it here
-	 */
-	while (1) {
-		k_sleep(MSEC_PER_SEC);
+	i2c_dev = device_get_binding("I2C_1");
+	i2c_configure(i2c_dev, I2C_SPEED_SET(I2C_SPEED_STANDARD) | I2C_MODE_MASTER);
+	
+	while (true) {
+		k_usleep(1);
 
-		/* Heartrate measurements simulation */
-		hl_bluetooth_hrs_notify(69);
+		if (read_flag) {
+			read_flag = false;
 
-		/* Battery level simulation */
-		hl_bluetooth_bas_notify(69);
+			uint16_t x, y;
+			touch_raw_read(&x, &y);
+			graphics_draw_rect(&ctx, x, y, 10, 10, DISPLAY_WHITE);
+		}
 	}
 }
