@@ -14,7 +14,7 @@ void _touch_pressed_cb(struct device *gpiob, struct gpio_callback *cb, u32_t pin
 // Initialises the touch controller.
 void touch_init(void) {
 	// Configure GPIO interrupt
-    struct device *gpio_dev = device_get_binding(TOUCH_INT_PORT);
+	struct device *gpio_dev = device_get_binding(TOUCH_INT_PORT);
 	gpio_pin_configure(gpio_dev, TOUCH_INT_PIN, GPIO_DIR_IN | GPIO_INT);
 	
 	gpio_init_callback(&_touch_callback, _touch_pressed_cb, BIT(TOUCH_INT_PIN));
