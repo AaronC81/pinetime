@@ -15,6 +15,25 @@ based on the Zephyr RTOS.
 
 3. Clone this repository into your Zephyr project.
 
+Once you're all done, your directory structure contain at least these
+directories (although it will have many more, this is a rough outline):
+
+```
+.
+├── .west
+├── zephyr
+|   └── boards
+|       └── arm
+|           └── pinetime
+|               ├── pinetime.dts
+|               └── pinetime.yaml
+└── pinetime <or whatever you cloned this repo as>
+    ├── CMakeLists.txt
+    ├── prj.conf
+    ├── pinetime.overlay
+    └── src
+```
+
 ## Building
 Once you've followed the setup instructions, open a terminal into **this repo**
 (not the root of your Zephyr project), and invoke `west` to build the project:
