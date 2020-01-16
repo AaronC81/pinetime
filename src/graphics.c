@@ -150,26 +150,29 @@ void graphics_draw_qr_code(struct graphics_context *ctx, uint8_t x, uint8_t y, c
 	}
 }
 
-void graphics_text_write_char(struct graphics_context *ctx, char character, uint16_t x, uint16_t y) {
+void graphics_text_write_char(struct graphics_context *ctx, uint16_t x, uint16_t y, char character, uint16_t fg_colour, uint16_t bg_colour) {
 	struct font_glyph c = font_glyphs[character - ' '];
 	for (int i = 0; i < c.width * c.height; i++) {
+		// TODO: could massively speed this up with buffer
 		int bit = font_data[c.bitmap_offset + (i / 8)] & (0b10000000 >> (i % 8));
+		// TODO: draws up from your y, not down from it
 		graphics_draw_rect_fast(
 			ctx,
 			x + c.x_offset + i % c.width,
 			y + c.y_offset + i / c.width,
 			1, 1,
-			bit ? DISPLAY_WHITE : DISPLAY_BLACK
+			bit ? fg_colour : bg_colour
 		);
 	}
 }
 
-void graphics_text_write_string(struct graphics_context *ctx, char* str, uint16_t x, uint16_t y) {
+// TODO: newline not supported yet
+void graphics_text_write_string(struct graphics_context *ctx, uint16_t x, uint16_t y, char* str, uint16_t fg_colour, uint16_t bg_colour) {
 	int i = 0;
 	char character;
 	while (character = str[i++]) {
 		struct font_glyph c = font_glyphs[character - ' '];
-		graphics_text_write_char(ctx, character, x, y);
+		graphics_text_write_char(ctx, x, y, character, fg_colour, bg_colour);
 		x += c.x_advance;
 	}
 }

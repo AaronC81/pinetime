@@ -18,7 +18,7 @@ struct font {
 	struct text_glyph *glyph;  ///< Glyph array
 	uint8_t first;             ///< ASCII extents (first char)
 	uint8_t last;              ///< ASCII extents (last char)
-	uint8_t yAdvance;          ///< Newline distance (y axis)
+	uint8_t y_advance;          ///< Newline distance (y axis)
 };
 
 const uint8_t font_data[] = {

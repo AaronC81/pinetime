@@ -65,7 +65,8 @@ void main(void) {
 	graphics_draw_rect(&ctx, 0, 0, 10, 10, DISPLAY_WHITE);
 	graphics_clear_display(&ctx);
 
-	graphics_text_write_string(&ctx, "Hello!", 30, 30);
+	graphics_draw_rect(&ctx, 25, 25, 100, 40, 0b0001100011100011);
+	graphics_text_write_string(&ctx, 30, 50, "Hello...", DISPLAY_WHITE, 0b0001100011100011);
 	
 	while (true) {
 		k_usleep(1);

@@ -38,5 +38,5 @@ void graphics_draw_qr_code(struct graphics_context *ctx, uint8_t x, uint8_t y, c
 
 void graphics_clear_display(struct graphics_context *ctx);
 
-void graphics_text_write_char(struct graphics_context *ctx, char character, uint16_t x, uint16_t y);
-void graphics_text_write_string(struct graphics_context *ctx, char* str, uint16_t x, uint16_t y);
+void graphics_text_write_char(struct graphics_context *ctx, uint16_t x, uint16_t y, char character, uint16_t fg_colour, uint16_t bg_colour);
+void graphics_text_write_string(struct graphics_context *ctx, uint16_t x, uint16_t y, char* str, uint16_t fg_colour, uint16_t bg_colour);
