@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+require 'open3'
+
+ADDRESS = 42
+SCL_CHANNEL = 'D0'
+SDA_CHANNEL = 'D4'
+DRIVER = 'fx2lafw'
+SAMPLE_RATE = '1M'
+
+COMMAND = "sigrok-cli -d #{DRIVER} --config samplerate=#{SAMPLE_RATE} " \
+  "--continuous -P i2c:scl=#{SCL_CHANNEL}:sda=#{SDA_CHANNEL}"
+
+byte_buffer = []
+
+IO.popen(COMMAND).each do |line|
+  line = line.chomp
+  # Buffer 0 for a write or 1 for a read
+  if line.end_with?("Address write: #{ADDRESS}")
+    byte_buffer << 0
+  elsif line.end_with?("Address read: #{ADDRESS}")
+    byte_buffer << 1
+  end
+
+  # If the byte buffer has hit 8 bits, we have a character
+  if byte_buffer.length == 8
+    print byte_buffer.join.to_i(2).chr
+    byte_buffer.clear
+  end
+end

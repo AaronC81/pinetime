@@ -6,6 +6,7 @@
 #include "graphics.h"
 #include "hl_bluetooth.h"
 #include "touch.h"
+#include "i2console.h"
 
 #define BL_PORT DT_ALIAS_LED1_GPIOS_CONTROLLER
 #define BL_PIN DT_ALIAS_LED1_GPIOS_PIN
@@ -58,6 +59,8 @@ void main(void) {
 	struct graphics_context ctx = graphics_init(display);
 	global_ctx = &ctx;
 	graphics_clear_display(&ctx);
+
+	LOG("Starting!");
 	
 	while (true) {
 		k_usleep(1);
