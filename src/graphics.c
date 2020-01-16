@@ -1,5 +1,6 @@
 #include "graphics.h"
 #include "qrcodegen.h"
+#include "font.h"
 
 #include <string.h>
 
@@ -146,5 +147,29 @@ void graphics_draw_qr_code(struct graphics_context *ctx, uint8_t x, uint8_t y, c
 				colour
 			);
 		}
+	}
+}
+
+void graphics_text_write_char(struct graphics_context *ctx, char character, uint16_t x, uint16_t y) {
+	struct font_glyph c = font_glyphs[character - ' '];
+	for (int i = 0; i < c.width * c.height; i++) {
+		int bit = font_data[c.bitmap_offset + (i / 8)] & (0b10000000 >> (i % 8));
+		graphics_draw_rect_fast(
+			ctx,
+			x + c.x_offset + i % c.width,
+			y + c.y_offset + i / c.width,
+			1, 1,
+			bit ? DISPLAY_WHITE : DISPLAY_BLACK
+		);
+	}
+}
+
+void graphics_text_write_string(struct graphics_context *ctx, char* str, uint16_t x, uint16_t y) {
+	int i = 0;
+	char character;
+	while (character = str[i++]) {
+		struct font_glyph c = font_glyphs[character - ' '];
+		graphics_text_write_char(ctx, character, x, y);
+		x += c.x_advance;
 	}
 }

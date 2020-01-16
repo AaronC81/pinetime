@@ -61,6 +61,11 @@ void main(void) {
 	graphics_clear_display(&ctx);
 
 	LOG("Starting!");
+
+	graphics_draw_rect(&ctx, 0, 0, 10, 10, DISPLAY_WHITE);
+	graphics_clear_display(&ctx);
+
+	graphics_text_write_string(&ctx, "Hello!", 30, 30);
 	
 	while (true) {
 		k_usleep(1);
