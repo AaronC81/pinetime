@@ -19,9 +19,9 @@
 #define DISPLAY_BLACK 0
 
 struct graphics_context {
-	struct device *display;
-	uint8_t *buffer;
-	struct display_buffer_descriptor descriptor;
+    struct device *display;
+    uint8_t *buffer;
+    struct display_buffer_descriptor descriptor;
 };
 
 void graphics_blanking_off(struct graphics_context *ctx);

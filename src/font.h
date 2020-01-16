@@ -5,20 +5,20 @@
 // From https://github.com/adafruit/Adafruit-GFX-Library/blob/master/Fonts/FreeSans12pt7b.h
 
 struct font_glyph {
-	uint16_t bitmap_offset; ///< Pointer into GFXfont->bitmap
-	uint8_t width;          ///< Bitmap dimensions in pixels
-	uint8_t height;         ///< Bitmap dimensions in pixels
-	uint8_t x_advance;      ///< Distance to advance cursor (x axis)
-	int8_t x_offset;        ///< X dist from cursor pos to UL corner
-	int8_t y_offset;        ///< Y dist from cursor pos to UL corner
+    uint16_t bitmap_offset; ///< Pointer into GFXfont->bitmap
+    uint8_t width;          ///< Bitmap dimensions in pixels
+    uint8_t height;         ///< Bitmap dimensions in pixels
+    uint8_t x_advance;      ///< Distance to advance cursor (x axis)
+    int8_t x_offset;        ///< X dist from cursor pos to UL corner
+    int8_t y_offset;        ///< Y dist from cursor pos to UL corner
 };
 
 struct font {
-	uint8_t *bitmap;           ///< Glyph bitmaps, concatenated
-	struct text_glyph *glyph;  ///< Glyph array
-	uint8_t first;             ///< ASCII extents (first char)
-	uint8_t last;              ///< ASCII extents (last char)
-	uint8_t y_advance;          ///< Newline distance (y axis)
+    uint8_t *bitmap;           ///< Glyph bitmaps, concatenated
+    struct text_glyph *glyph;  ///< Glyph array
+    uint8_t first;             ///< ASCII extents (first char)
+    uint8_t last;              ///< ASCII extents (last char)
+    uint8_t y_advance;          ///< Newline distance (y axis)
 };
 
 const uint8_t font_data[] = {
@@ -286,4 +286,4 @@ const struct font_glyph font_glyphs[] = {
     {1962, 10, 5, 12, 1, -10}}; // 0x7E '~'
 
 const struct font font =
-	{(uint8_t*)font_data, (struct font_glyph*)font_glyphs, 0x20, 0x7E, 22};
+    {(uint8_t*)font_data, (struct font_glyph*)font_glyphs, 0x20, 0x7E, 22};
